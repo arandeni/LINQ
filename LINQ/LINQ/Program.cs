@@ -1,9 +1,30 @@
 ﻿// See https://aka.ms/new-console-template for more information
-//Console.WriteLine("Hello, World!");
+
 
 using LINQ;
 
-IList<Employee> employees = new List<Employee>()
+//Using Array
+string[] names = { "Bill", "James", "Mohan"};
+var myQuery = from name in names
+              where name.Contains("a")
+              select name;
+foreach(var name in myQuery)
+{
+    Console.WriteLine(name);
+}
+
+IList<string> stringList = new List<string>() 
+{"Canada", "Singapore", "USA", "Austrailia", "Sri Lanka"};
+
+//LINQ Query Syntax
+var result1 = from s in stringList
+              where s.Contains("S")
+              select s;
+
+//LINQ Mthod Syntax
+var result2 = stringList.Where(s => s.Contains("S"));
+
+IList < Employee > employees = new List<Employee>()
 {
     new Employee(){ EmpId = 123, Name = "Jon", DOB = new DateTime(1989, 01, 07)},
     new Employee(){ EmpId = 124, Name = "Alex", DOB= new DateTime(1985, 07, 06)},
