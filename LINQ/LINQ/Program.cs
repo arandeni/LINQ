@@ -40,7 +40,7 @@ IList<EmployeeSalary> employeeSalaries = new List<EmployeeSalary>()
 {
     new EmployeeSalary(){ EmpId = 123, EmpSalary = 20000 },
     new EmployeeSalary(){ EmpId = 124, EmpSalary = 80000},
-     new EmployeeSalary(){ EmpId = 125, EmpSalary = 20000},
+    new EmployeeSalary(){ EmpId = 125, EmpSalary = 20000},
 };
 
 IList<EmployeeProject> employeeProjects = new List<EmployeeProject>()
@@ -55,7 +55,8 @@ IList<Projects> projects = new List<Projects>() {
     new Projects(){ ProjectId = 2, Project = "PQS"}
 };
 
-var selectedEmployees = from emp in employees
+//Query Syntax
+var selectedEmployees1 = from emp in employees
                         join bnd in employeeBands on emp.EmpId equals bnd.EmpId
                         join salary in employeeSalaries on emp.EmpId equals salary.EmpId
                         where salary.EmpSalary > 50000
@@ -66,13 +67,38 @@ var selectedEmployees = from emp in employees
                             Band = bnd.EmpBand
                         };
 
-var sumOfSalaries = from salary in employeeSalaries
+//Method Syntax
+var selectedEmployees2 = employees.Join(employeeBands, emp1 => emp1.EmpId, bnd => bnd.EmpId, (emp1, bnd) => new
+{
+    emp1, bnd
+}).Join(employeeSalaries, emp2 => emp2.emp1.EmpId, sal => sal.EmpId, (emp2, sal) => new
+{
+    emp2, sal
+}).Where(s => s.sal.EmpSalary > 50000).Select(s => new { 
+    EmpId = s.emp2.emp1.EmpId,
+    EmpName = s.emp2.emp1.Name,
+    Band = s.emp2.bnd.EmpBand
+});
+
+//Query Syntax
+var sumOfSalaries1 = from salary in employeeSalaries
                     join empProj in employeeProjects on salary.EmpId equals empProj.EmpId
                     join proj in projects on empProj.ProjectId equals proj.ProjectId
                     where proj.Project == "PQS"
                     select salary;
 
-var sum = sumOfSalaries.Sum(s => s.EmpSalary);
+var sum = sumOfSalaries1.Sum(s => s.EmpSalary);
 
 Console.WriteLine("Sum:" + sum);
+
+//Method Syntax
+var sumOfSalaries2 = employeeSalaries.Join(employeeProjects, sal => sal.EmpId, empProj1 => empProj1.EmpId, (sal, empProj1) => new 
+{ 
+    sal, empProj1
+}).Join(projects, empProj2 => empProj2.empProj1.ProjectId, proj => proj.ProjectId, (empProj2, proj) => new 
+{
+    empProj2, proj
+}).Where(s => s.proj.Project == "PQS").Sum(m => m.empProj2.sal.EmpSalary);
+
+Console.WriteLine("End");
 
